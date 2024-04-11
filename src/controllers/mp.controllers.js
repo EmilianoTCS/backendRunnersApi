@@ -122,7 +122,7 @@ export const payFee = async (req, res) => {
           pending: "https://www.puntotrail.com/inscription",
         },
         auto_return: "approved",
-        notification_url: `https://backend-runners-api.vercel.app/api/payment/webhookMP/${feeID}`,
+        notification_url: `https://ultrachampa-backend.vercel.app/api/payment/webhookMP/${feeID}`,
         date_of_expiration: json_linkExpireDate,
         metadata: { AuthTokenClient: authToken },
       };
