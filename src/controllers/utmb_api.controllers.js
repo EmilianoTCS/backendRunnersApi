@@ -16,7 +16,7 @@ export const memberSimple = async (req, res) => {
       Authorization: authToken,
     },
   })
-    .then((res) => (respuesta = res.text()))
+    .then((res) => (respuesta = res.json()))
     .then((response) => {
       const data = response;
       // console.log("data", data);
@@ -34,15 +34,9 @@ export const localMemberSimple = async (authToken) => {
   await fetch(url, {
     method: "GET",
     headers: {
-      Authorization: authToken,
+      Authorization: "Bearer " + authToken,
     },
-  })
-    .then((res) => (respuesta = res.text()))
-    .then((response) => {
-      const data = response;
-      // console.log("data", data);
-      res.send(data);
-    });
+  }).then((res) => (respuesta = res.json()));
 
   return respuesta;
 };
@@ -122,7 +116,7 @@ export const registerRaceApi = async (token, body, raceID) => {
 };
 
 export const formatDate = (fecha) => {
-  const dateString = fecha.toISOString()
+  const dateString = fecha.toISOString();
   const fechaFormateada = dateString.split("T");
   return fechaFormateada[0];
 };
@@ -164,6 +158,9 @@ export const Testeo = async (req, res) => {
       : "H";
   const userTeam = userInfo.team;
 
+  const { access_token } = await getTokenApi();
+  // const { information } = await localMemberSimple(access_token);
+
   var body = {
     firstName: userFirstname,
     lastName: userLastname,
@@ -181,12 +178,7 @@ export const Testeo = async (req, res) => {
     grp: userTeam,
   };
 
-  console.log(body);
-
-  const { access_token } = await getTokenApi();
-
   respuesta = await registerRaceApi(access_token, body, utmbRaceId);
-
   if (respuesta.status === "OK") {
     return res
       .status(200)
