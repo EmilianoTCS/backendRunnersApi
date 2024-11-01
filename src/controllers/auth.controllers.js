@@ -86,6 +86,7 @@ export const userLogin = async (req, res) => {
   const { email } = tokenParsed;
   const userFound = await User.findOne({ email }).populate("role");
 
+  console.log("tknParsed", tokenParsed, "email", email);
   if (!userFound) return res.status(404).json({ message: "User not found" });
   // if (userFound) {
   //   UpdateDataFromUser(tokenParsed);
