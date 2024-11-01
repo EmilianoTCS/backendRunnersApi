@@ -84,8 +84,8 @@ export const userRegister = async (req, res) => {
 export const userLogin = async (req, res) => {
   // const { email, password, tokenParsed } = req.body;
   const { tokenParsed } = req.body;
-  const tkn = JSON.parse(token);
-  const { email } = tkn;
+  // const tkn = JSON.parse(token);
+  const { email } = token;
   const userFound = await User.findOne({ email }).populate("role");
   if (!userFound) return res.status(404).json({ message: "User not found" });
 
