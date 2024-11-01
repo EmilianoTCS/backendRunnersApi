@@ -77,7 +77,7 @@ export const payProduct = async (req, res) => {
 //Generador de links de pago, recibe el ID de la cuota a pagar como parámetro
 export const payFee = async (req, res) => {
   let body = req.body;
-  const { feeID, authToken } = body;
+  const { feeID } = body;
   const fee = await Fee.findOne({ _id: feeID }).exec(); //Obtengo toda la información de la cuota ingresada
   try {
     var now = new Date(); //fecha actual
@@ -133,7 +133,6 @@ export const payFee = async (req, res) => {
         auto_return: "approved",
         notification_url: `https://backend-runners-api.vercel.app/api/payment/webhookMP/${feeID}`,
         date_of_expiration: json_linkExpireDate,
-        metadata: {AuthTokenClient: authToken}
       };
 
       // Crear la preferencia de pago en Mercado Pago
@@ -178,6 +177,7 @@ export const receiveWebhook = async (req, res) => {
   const salePrice = saleInfo.price;
   const userIdSale = saleInfo.user;
   const raceIdSale = saleInfo.race;
+  const userBirthdate = formatDate(userInfo.birthdate);
 
 
   //INFO RACES
@@ -201,6 +201,7 @@ export const receiveWebhook = async (req, res) => {
   var body = {
     firstName: userFirstname,
     lastName: userLastname,
+    birthdate: userBirthdate,
     gender: userGender,
     email: userEmail,
     nationality: userNationality.substring(0, 3),
@@ -228,9 +229,9 @@ export const receiveWebhook = async (req, res) => {
           const { access_token } = await getTokenApi();
 
           if (access_token !== "") {
-            const { information } = await localMemberSimple(data.body.metadata.AuthTokenClient);
+            const { birthdateIso } = await localMemberSimple(access_token);
 
-            body.birthdate = information.birthdateIso;
+            body.birthdate = birthdateIso;
 
             await registerRaceApi(access_token, body, utmbRaceId);
           }
@@ -240,8 +241,8 @@ export const receiveWebhook = async (req, res) => {
             const { access_token } = await getTokenApi();
 
             if (access_token !== "") {
-              const { information } = await localMemberSimple(data.body.metadata.AuthTokenClient);
-              body.birthdate = information.birthdateIso;
+              const { birthdateIso } = await localMemberSimple(access_token);
+              body.birthdate = birthdateIso;
 
               await registerRaceApi(access_token, body, utmbRaceId);
             }
