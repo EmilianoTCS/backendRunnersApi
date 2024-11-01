@@ -79,17 +79,19 @@ export const userRegister = async (req, res) => {
   }
 };
 
+// -------- login
+
 export const userLogin = async (req, res) => {
-  const { email, password } = req.body;
+  const { tokenParsed } = req.body;
+  const { email } = tokenParsed;
   const userFound = await User.findOne({ email }).populate("role");
 
   if (!userFound) return res.status(404).json({ message: "User not found" });
-
-  const matchPassword = await bcrypt.compare(password, userFound.password);
-
-  if (!matchPassword) {
-    return res.status(404).json({ token: null, message: "Invalid password" });
-  }
+  // if (userFound) {
+  //   UpdateDataFromUser(tokenParsed);
+  // } else {
+  //   newUserRegister(tokenParsed);
+  // }
 
   const token = jwt.sign(
     { id: userFound._id },
@@ -137,6 +139,135 @@ export const userLogin = async (req, res) => {
     basesYCondiciones: userFound.basesYCondiciones,
   });
 };
+
+const UpdateDataFromUser = async (data) => {
+  const {
+    document,
+    location,
+    gender,
+    insurance,
+    shirtSize,
+    nationality,
+    phoneNumber,
+    emergencyContact,
+    isCeliac,
+    alergic,
+    firstValhol,
+    distance,
+    team,
+    birthdate,
+    primeraCarrera,
+    primerViajeAlLugar,
+    diasAlojamiento,
+    comoLlegas,
+    personasNoParticipantes,
+    comoTeEnteraste,
+    carrerasAlAnio,
+    basesYCondiciones,
+  } = req.body;
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: data._id },
+      {
+        document,
+        location,
+        gender,
+        insurance,
+        shirtSize,
+        nationality,
+        phoneNumber,
+        emergencyContact,
+        isCeliac,
+        alergic,
+        firstValhol,
+        distance,
+        team,
+        birthdate,
+        primeraCarrera,
+        primerViajeAlLugar,
+        diasAlojamiento,
+        comoLlegas,
+        personasNoParticipantes,
+        comoTeEnteraste,
+        carrerasAlAnio,
+        basesYCondiciones,
+      },
+      { new: true } // para que devuelva el usuario actualizado en vez del anterior
+    );
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const newUserRegister = async (data) => {
+  let {
+    name,
+    lastname,
+    email,
+    password,
+    gender,
+    location,
+    role,
+    primeraCarrera,
+    primerViajeAlLugar,
+    diasAlojamiento,
+    comoLlegas,
+    personasNoParticipantes,
+    comoTeEnteraste,
+    carrerasAlAnio,
+    basesYCondiciones,
+  } = data;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const newUser = new User({
+      name,
+      lastname,
+      email,
+      password: hashedPassword,
+      gender,
+      location,
+      role,
+      primeraCarrera,
+      primerViajeAlLugar,
+      diasAlojamiento,
+      comoLlegas,
+      personasNoParticipantes,
+      comoTeEnteraste,
+      carrerasAlAnio,
+      basesYCondiciones,
+    });
+    if (role) {
+      const foundRoles = await Role.find({ name: { $in: role } });
+      newUser.role = foundRoles.map((role) => role._id);
+    } else {
+      const role = await Role.findOne({ name: "user" });
+      newUser.role = [role._id];
+    }
+
+    const savedUser = await newUser.save();
+    await RegisterData.updateOne(
+      {},
+      { $inc: { registeredUsers: 1 } },
+      { upsert: true }
+    );
+    const token = jwt.sign(
+      { id: savedUser?._id },
+      process.env.SECRET || config.SECRET,
+      {
+        expiresIn: 43200, // 12 horas
+      }
+    );
+    res.json({ token });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ----------------------
 
 export const refreshToken = async (req, res) => {
   const { refreshToken } = req.body;
