@@ -82,16 +82,18 @@ export const userRegister = async (req, res) => {
 // -------- login
 
 export const userLogin = async (req, res) => {
-  const { email, password, tokenParsed } = req.body;
+  // const { email, password, tokenParsed } = req.body;
+  const { tokenParsed } = req.body;
+  const tkn = JSON.parse(token);
+  const { email } = tkn;
   const userFound = await User.findOne({ email }).populate("role");
-
   if (!userFound) return res.status(404).json({ message: "User not found" });
 
-  const matchPassword = await bcrypt.compare(password, userFound.password);
+  // const matchPassword = await bcrypt.compare(password, userFound.password);
 
-  if (!matchPassword) {
-    return res.status(404).json({ token: null, message: "Invalid password" });
-  }
+  // if (!matchPassword) {
+  //   return res.status(404).json({ token: null, message: "Invalid password" });
+  // }
 
   console.log("tknParsed", tokenParsed, "email", email);
   if (!userFound) return res.status(404).json({ message: "User not found" });
