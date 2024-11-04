@@ -84,8 +84,15 @@ export const userRegister = async (req, res) => {
 export const userLogin = async (req, res) => {
   // const { email, password, tokenParsed } = req.body;
   const { tokenParsed } = req.body;
+
+  console.log(
+    "tokenParsed",
+    tokenParsed,
+    "tokenParsedStr",
+    JSON.stringify(tokenParsed)
+  );
   // const tkn = JSON.parse(token);
-  const { email } = JSON.parse(tokenParsed);
+  const { email } = tokenParsed;
   const userFound = await User.findOne({ email }).populate("role");
   if (!userFound) return res.status(404).json({ message: "User not found" });
 
@@ -95,7 +102,7 @@ export const userLogin = async (req, res) => {
   //   return res.status(404).json({ token: null, message: "Invalid password" });
   // }
 
-  console.log("tknParsed", tokenParsed, "email", email);
+  // console.log("tknParsed", tokenParsed, "email", email);
   if (!userFound) return res.status(404).json({ message: "User not found" });
 
   const token = jwt.sign(
