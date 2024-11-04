@@ -86,7 +86,7 @@ export const userLogin = async (req, res) => {
   const { tknUTMB } = req.body;
 
   // const tkn = JSON.parse(token);
-  const { email } = tknUTMB;
+  const { email } = JSON.parse(tknUTMB);
 
   console.log("email", email, "tknUTMB", tknUTMB);
   const userFound = await User.findOne({ email }).populate("role");
