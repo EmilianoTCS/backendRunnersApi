@@ -5,5 +5,5 @@ import { verifyToken } from "../middlewares/verifyToken";
 const router = Router();
 
 router.get("/getStats", [verifyToken], documentCount);
-router.get("/getHistoricStats", [verifyToken], HistoricStats);
+router.post("/getHistoricStats", [verifyToken], HistoricStats);
 export default router;
