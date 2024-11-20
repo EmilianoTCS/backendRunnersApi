@@ -306,7 +306,6 @@ export async function HistoricStats(req, res) {
         },
         periodMetrics: dateRangeResult,
       },
-      // timestamp: new Date().toISOString(),
     };
 
     return res.status(200).json(response);

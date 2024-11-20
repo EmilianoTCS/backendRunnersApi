@@ -23,6 +23,27 @@ export const generateDiscountCodes = async (req, res) => {
   }
 };
 
+export const createNewDiscountCode = async (req, res) => {
+  let body = req.body;
+  const { name, discountAmount, limit } = body; // Se obtienen los datos de la carrera del cuerpo de la solicitud
+
+  try {
+    const newDiscountCode = new DiscountCode({
+      name,
+      discountAmount,
+      limit,
+    });
+
+    const savedDiscountCode = await newDiscountCode.save(); //Si todo esta bien, creo el nuevo registro
+
+    //Devuelvo la respuesta
+    res.status(201).json({ savedDiscountCode });
+  } catch (error) {
+    // Manejo del error
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const generateDiscountCode = (length) => {
   const characters =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
