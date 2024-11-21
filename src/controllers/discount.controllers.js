@@ -26,7 +26,12 @@ export const generateDiscountCodes = async (req, res) => {
 export const createNewDiscountCode = async (req, res) => {
   // Destructure request body with default values and validation
   const { name = "", discountAmount = 0, limit = null } = req.body;
-  console.log("body", body);
+  console.log("body", req.body);
+  if (req.body) {
+    return res.status(203).json({
+      message: req.body,
+    });
+  }
   // Validate input
   if (!name.trim()) {
     return res.status(400).json({
