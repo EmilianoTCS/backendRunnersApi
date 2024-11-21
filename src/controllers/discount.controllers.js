@@ -25,22 +25,18 @@ export const generateDiscountCodes = async (req, res) => {
 
 export const createNewDiscountCode = async (req, res) => {
   // Destructure request body with default values and validation
-  const { 
-    name = '', 
-    discountAmount = 0, 
-    limit = null 
-  } = req.body;
-
+  const { name = "", discountAmount = 0, limit = null } = req.body;
+  console.log("body", body);
   // Validate input
   if (!name.trim()) {
-    return res.status(400).json({ 
-      message: 'El nombre del código es requerido' 
+    return res.status(400).json({
+      message: "El nombre del código es requerido",
     });
   }
 
   if (discountAmount <= 0) {
-    return res.status(400).json({ 
-      message: 'El porcentaje de descuento debe ser mayor a cero' 
+    return res.status(400).json({
+      message: "El porcentaje de descuento debe ser mayor a cero",
     });
   }
 
@@ -54,20 +50,21 @@ export const createNewDiscountCode = async (req, res) => {
 
     // Save the discount code
     const savedDiscountCode = await newDiscountCode.save();
+    console.log("savedDiscountCode", savedDiscountCode);
 
     // Return successful response
-    res.status(201).json({ 
-      message: 'Código de descuento creado exitosamente',
-      discountCode: savedDiscountCode 
+    res.status(201).json({
+      message: "Código de descuento creado exitosamente",
+      discountCode: savedDiscountCode,
     });
   } catch (error) {
     // Log the error for server-side tracking
-    console.error('Error creating discount code:', error);
+    console.error("Error creating discount code:", error);
 
     // Send a more informative error response
-    res.status(500).json({ 
-      message: 'Failed to create discount code', 
-      error: error.message 
+    res.status(500).json({
+      message: "Failed to create discount code",
+      error: error.message,
     });
   }
 };
