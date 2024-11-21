@@ -2,7 +2,7 @@ import Sale from "../models/Sale";
 import Fee from "../models/Fee.js";
 import { createFee } from "./fee.controllers.js";
 import DiscountCode from "../models/DiscountCodes.js";
-
+import mongoose from 'mongoose';
 export const createSale = async (req, res) => {
   try {
     const {
