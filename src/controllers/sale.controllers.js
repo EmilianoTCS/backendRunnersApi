@@ -84,7 +84,7 @@ export const createSale = async (req, res) => {
     // Si hay código de descuento, verificar su validez
     if (discountCode.trim()) {
       const codeFound = await DiscountCode.findOne({ 
-        discountCode: discountCode.trim() 
+        code: discountCode.trim() 
       }).select('limit');
       
       if (!codeFound) {
@@ -105,7 +105,7 @@ export const createSale = async (req, res) => {
         await session.withTransaction(async () => {
           // Actualizar límite del código de descuento
           await DiscountCode.findOneAndUpdate(
-            { discountCode: discountCode.trim() },
+            { code: discountCode.trim() },
             { $inc: { limit: -1 } },
             { session }
           );
