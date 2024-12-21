@@ -2,37 +2,83 @@ import DiscountCode from "../models/DiscountCodes";
 import Race from "../models/Race";
 import User from "../models/Users";
 
-export const generateDiscountCodes = async (req, res) => {
-  const { quantity, discountPercentage } = req.body;
-  const codeLength = 5;
+// export const generateDiscountCodes = async (req, res) => {
+//   const { quantity, discountPercentage } = req.body;
+//   const codeLength = 5;
+
+//   try {
+//     const codes = [];
+//     for (let i = 0; i < quantity; i++) {
+//       const code = generateDiscountCode(codeLength);
+//       const discountCode = new DiscountCode({
+//         code: code,
+//         discount: discountPercentage,
+//       });
+//       const savedDiscountCode = await discountCode.save();
+//       codes.push(savedDiscountCode);
+//     }
+//     res.status(200).json(codes);
+//   } catch (error) {
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
+export const createNewDiscountCode = async (req, res) => {
+  // Destructure request body with default values and validation
+  const { name = "", discountAmount = 0, limit = null } = req.body;
+  console.log("body", req.body);
+
+  // Validate input
+  if (!name.trim()) {
+    return res.status(400).json({
+      message: "El nombre del código es requerido",
+    });
+  }
+
+  if (discountAmount <= 0) {
+    return res.status(400).json({
+      message: "El porcentaje de descuento debe ser mayor a cero",
+    });
+  }
 
   try {
-    const codes = [];
-    for (let i = 0; i < quantity; i++) {
-      const code = generateDiscountCode(codeLength);
-      const discountCode = new DiscountCode({
-        code: code,
-        discount: discountPercentage,
-      });
-      const savedDiscountCode = await discountCode.save();
-      codes.push(savedDiscountCode);
-    }
-    res.status(200).json(codes);
+    // Create new discount code
+    const newDiscountCode = new DiscountCode({
+      code: name.trim(), // Remove any leading/trailing whitespace
+      discount: Number(discountAmount), // Ensure it's a number
+      limit: limit !== null ? Number(limit) : null, // Convert to number if not null
+    });
+
+    // Save the discount code
+    const savedDiscountCode = await newDiscountCode.save();
+
+    // Return successful response
+    res.status(201).json({
+      message: "Código de descuento creado exitosamente",
+      discountCode: savedDiscountCode,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    // Log the error for server-side tracking
+    console.error("Error creating discount code:", error);
+
+    // Send a more informative error response
+    res.status(500).json({
+      message: "Failed to create discount code",
+      error: error.message,
+    });
   }
 };
 
-const generateDiscountCode = (length) => {
-  const characters =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let code = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    code += characters.charAt(randomIndex);
-  }
-  return code;
-};
+// const generateDiscountCode = (length) => {
+//   const characters =
+//     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+//   let code = "";
+//   for (let i = 0; i < length; i++) {
+//     const randomIndex = Math.floor(Math.random() * characters.length);
+//     code += characters.charAt(randomIndex);
+//   }
+//   return code;
+// };
 
 export const applyDiscountCode = async (req, res) => {
   const raceId = req.params.id;
