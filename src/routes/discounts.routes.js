@@ -1,9 +1,9 @@
 import { Router } from "express";
 import {
   applyDiscountCode,
-  generateDiscountCodes,
   getAllDiscountCodes,
   getDiscountCodeDetails,
+  createNewDiscountCode,
 } from "../controllers/discount.controllers";
 
 import { verifyToken, isAdmin } from "../middlewares/verifyToken";
@@ -11,13 +11,13 @@ const router = Router();
 
 router.get("/getAllDiscountCodes", [verifyToken, isAdmin], getAllDiscountCodes);
 
-router.get("/getDiscountCode/:code", getDiscountCodeDetails);
-
 router.post(
-  "/createDiscountCodes",
+  "/createDiscountCode",
   [verifyToken, isAdmin],
-  generateDiscountCodes
+  createNewDiscountCode
 );
+
+router.get("/getDiscountCode/:code", getDiscountCodeDetails);
 
 router.post("/applyDiscountCode/:id", verifyToken, applyDiscountCode);
 
