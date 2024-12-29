@@ -12,9 +12,9 @@ import { createRoles } from "./libs/initialSetup";
 import teamRoutes from "./routes/team.routes";
 import teamMembersRoutes from "./routes/teamMembers.routes";
 import statsRoutes from "./routes/stats.routes";
-import test from "./routes/test.routes";
+import pluspagosRoutes from "./routes/plusplagos.routes";
 import cors from "cors";
-import utmb_api from "./routes/utmb_api.routes"
+
 
 const app = express();
 createRoles();
@@ -38,7 +38,6 @@ app.use("/api/payment", mpRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/teamMembers", teamMembersRoutes);
 app.use("/api/stats", statsRoutes);
-app.use("/api/test", test);
-app.use("/api/utmb_api", utmb_api);
+app.use("/api/pluspagos", pluspagosRoutes);
 
 export default app;
