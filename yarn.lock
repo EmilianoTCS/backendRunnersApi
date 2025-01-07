@@ -5686,6 +5686,11 @@ pkg-types@^1.0.3:
     mlly "^1.2.0"
     pathe "^1.1.0"
 
+pluspagos-aes-encryption@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/pluspagos-aes-encryption/-/pluspagos-aes-encryption-1.0.0.tgz#5fcce631d3127ad0183af0c0045c2cfb6adf89bf"
+  integrity sha512-oTTczFV2M+5QVWcllUdr6wPqThoAjt8hJRT7cWnV0Ij++eV6F/B58K3H8jxHcQjmITrpMvvTuQ5IamqzAAOz4Q==
+
 postcss-discard-duplicates@^5.1.0:
   version "5.1.0"
   resolved "https://registry.npmjs.org/postcss-discard-duplicates/-/postcss-discard-duplicates-5.1.0.tgz"
