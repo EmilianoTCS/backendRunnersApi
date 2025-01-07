@@ -12,6 +12,7 @@ import { createRoles } from "./libs/initialSetup";
 import teamRoutes from "./routes/team.routes";
 import teamMembersRoutes from "./routes/teamMembers.routes";
 import statsRoutes from "./routes/stats.routes";
+import pluspagosRoutes from "./routes/plusplagos.routes";
 import cors from "cors";
 
 
@@ -37,5 +38,6 @@ app.use("/api/payment", mpRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/teamMembers", teamMembersRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/pluspagos", pluspagosRoutes);
 
 export default app;
