@@ -9,7 +9,7 @@ export const payProduct = async (req, res) => {
     producto,
     comercio,
   } = req.body;
-
+//hola
   try {
     // Encriptar los datos usando la librería
     const encryptedData = {
