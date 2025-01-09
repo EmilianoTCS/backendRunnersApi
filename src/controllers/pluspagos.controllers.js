@@ -9,7 +9,9 @@ export const payProduct = async (req, res) => {
     producto,
     comercio,
   } = req.body;
-//hola
+
+  const SECRET_KEY = process.env.SECRET_KEY_MACRO;
+  //hola
   try {
     // Encriptar los datos usando la librería
     const encryptedData = {
