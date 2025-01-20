@@ -3,6 +3,15 @@ import Race from "../models/Race";
 import RegisterData from "../models/RegisterData";
 import DiscountCode from "../models/DiscountCodes";
 import Fee from "../models/Fee";
+import Sale from "../models/Sale";
+import Users from "../models/Users";
+import fetch from "node-fetch";
+import {
+  getTokenApi,
+  registerRaceApi,
+  localMemberSimple,
+  formatDate,
+} from "./utmb_api.controllers";
 
 mercadopago.configure({
   access_token: process.env.ACCESS_TOKEN,
@@ -122,7 +131,7 @@ export const payFee = async (req, res) => {
           pending: "https://www.puntotrail.com/inscription",
         },
         auto_return: "approved",
-        notification_url: `https://ultrachampa-backend.vercel.app/api/payment/webhookMP/${feeID}`,
+        notification_url: `https://backend-runners-api.vercel.app/api/payment/webhookMP/${feeID}`,
         date_of_expiration: json_linkExpireDate,
         metadata: { AuthTokenClient: authToken },
       };
@@ -151,8 +160,53 @@ export const payFee = async (req, res) => {
 
 //Función que se ejecuta después de realizar el pago del link generado anteriormente, recibe el body enviado por el script de MP y el ID de la cuota.
 export const receiveWebhook = async (req, res) => {
+  const now = new Date();
   const payment = req.query;
   const feeID = req.params.feeID;
+
+  //Obtengo toda la info de la cuota ingresada
+  const feeInfo = await Fee.findById(feeID).exec();
+  const feeSaleID = feeInfo.sale;
+  const numFee = feeInfo.numFee;
+  const feePrice = feeInfo.feePrice;
+  //INFO VENTAS
+  const saleInfo = await Sale.findById(feeSaleID).exec();
+  const salePrice = saleInfo.price;
+  const userIdSale = saleInfo.user;
+  const raceIdSale = saleInfo.race;
+  const userBirthdate = formatDate(userInfo.birthdate);
+  //INFO RACES
+  const raceInfo = await Race.findById(raceIdSale).exec();
+  const utmbRaceId = raceInfo.utmbRaceId;
+  //USER INFO
+  const userInfo = await Users.findById(userIdSale).exec();
+  const userFirstname = userInfo.name;
+  const userLastname = userInfo.lastname;
+  const userEmail = userInfo.email;
+  const userNationality = userInfo.nationality;
+  const userGender =
+    userInfo.gender === "femenino"
+      ? "F"
+      : userInfo.gender === "masculino"
+      ? "M"
+      : "H";
+  const userTeam = userInfo.team;
+  var body = {
+    firstName: userFirstname,
+    lastName: userLastname,
+    birthdate: userBirthdate,
+    gender: userGender,
+    email: userEmail,
+    nationality: userNationality.substring(0, 3),
+    registrationFee: 0,
+    totalPaid: salePrice,
+    currency: "ARS",
+    urlDashboard: "",
+    registrationDate: now.toISOString(),
+    status: "REGISTERED", // CANCELLED
+    fileNumber: feeID,
+    grp: userTeam,
+  };
 
   let successResponseSent = false; //Booleano auxiliar que indica el status 200 y si ya fue enviado
 
@@ -161,14 +215,33 @@ export const receiveWebhook = async (req, res) => {
     if (payment.type === "payment") {
       const data = await mercadopago.payment.findById(payment["data.id"]);
 
-
       if (data.body.status === "approved") {
+        if (numFee === 3) {
+          //INSERT O AVISO A API DE UMTB EL REGISTRO DE UNA CARRERA
+          const { access_token } = await getTokenApi();
+          if (access_token !== "") {
+            const { birthdateIso } = await localMemberSimple(access_token);
+            body.birthdate = birthdateIso;
+            await registerRaceApi(access_token, body, utmbRaceId);
+          }
+        } else if (numFee === 1) {
+          if (parseFloat(feePrice) === parseFloat(salePrice)) {
+            //INSERT O AVISO A API DE UMTB EL REGISTRO DE UNA CARRERA
+            const { access_token } = await getTokenApi();
+            if (access_token !== "") {
+              const { birthdateIso } = await localMemberSimple(access_token);
+              body.birthdate = birthdateIso;
+
+              await registerRaceApi(access_token, body, utmbRaceId);
+            }
+          }
+        }
 
         //Establezco los filtros y los parámetros a actualizar
         const filterActual = { _id: feeID };
         const updateActual = { isActive: false, isPayed: true };
         //Cambio los valores de la cuota ingresada: isActive -> false (deshabilita el boton pagar), isPayed -> true (fue pagada.)
-        
+
         await Fee.findOneAndUpdate(filterActual, updateActual, { new: true });
         successResponseSent = true;
         res.status(200).json({ message: "Operación exitosa." });
