@@ -3,6 +3,7 @@ import Sale from "../models/Sale";
 import Race from "../models/Race";
 import Users from "../models/Users";
 import fetch from "node-fetch";
+
 export const memberSimple = async (req, res) => {
   const { authToken } = req.body;
   var respuesta = "";

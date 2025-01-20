@@ -5,7 +5,7 @@ import DiscountCode from "../models/DiscountCodes";
 import Fee from "../models/Fee";
 import Sale from "../models/Sale";
 import Users from "../models/Users";
-import fetch from "node-fetch";
+
 import {
   getTokenApi,
   registerRaceApi,

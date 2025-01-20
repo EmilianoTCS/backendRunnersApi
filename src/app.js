@@ -39,6 +39,7 @@ app.use("/api/payment", mpRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/teamMembers", teamMembersRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/utmb_api", utmb_api);
 app.use("/api/pluspagos", pluspagosRoutes);
 app.use("/api/utmb_api", utmb_api);
 
