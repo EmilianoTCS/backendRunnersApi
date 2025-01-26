@@ -27,7 +27,7 @@ const userSchema = new Schema(
     },
     nationality: { type: String, required: false },
     tokenExp: { type: Date, default: null },
-    password: { type: String, trim: true, minlength: 7, required: true },
+    password: { type: String, trim: true, minlength: 7, required: false },
     location: {
       country: { type: String, required: false },
       province: { type: String, required: false },

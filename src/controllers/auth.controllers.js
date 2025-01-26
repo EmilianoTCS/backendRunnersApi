@@ -100,7 +100,10 @@ export const userLogin = async (req, res) => {
   // }
 
   // console.log("tknParsed", tokenParsed, "email", email);
-  if (!userFound) return res.status(404).json({ message: "User not found" });
+  // if (!userFound) return res.status(404).json({ message: "User not found" });
+  if (!userFound) {
+    newUserRegister(tknUTMB);
+  }
 
   const token = jwt.sign(
     { id: userFound._id },
@@ -211,50 +214,20 @@ const UpdateDataFromUser = async (data) => {
 };
 
 const newUserRegister = async (data) => {
-  let {
-    name,
-    lastname,
-    email,
-    password,
-    gender,
-    location,
-    role,
-    primeraCarrera,
-    primerViajeAlLugar,
-    diasAlojamiento,
-    comoLlegas,
-    personasNoParticipantes,
-    comoTeEnteraste,
-    carrerasAlAnio,
-    basesYCondiciones,
-  } = data;
+  let { email, given_name, family_name, gender } = data;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 12);
     const newUser = new User({
-      name,
-      lastname,
       email,
-      password: hashedPassword,
+      given_name,
+      family_name,
       gender,
-      location,
-      role,
-      primeraCarrera,
-      primerViajeAlLugar,
-      diasAlojamiento,
-      comoLlegas,
-      personasNoParticipantes,
-      comoTeEnteraste,
-      carrerasAlAnio,
-      basesYCondiciones,
+      role: "user",
+      basesYCondiciones: "acepto",
     });
-    if (role) {
-      const foundRoles = await Role.find({ name: { $in: role } });
-      newUser.role = foundRoles.map((role) => role._id);
-    } else {
-      const role = await Role.findOne({ name: "user" });
-      newUser.role = [role._id];
-    }
+
+    const role = await Role.findOne({ name: "user" });
+    newUser.role = [role._id];
 
     const savedUser = await newUser.save();
     await RegisterData.updateOne(
