@@ -102,54 +102,54 @@ export const userLogin = async (req, res) => {
   // console.log("tknParsed", tokenParsed, "email", email);
   // if (!userFound) return res.status(404).json({ message: "User not found" });
   if (!userFound) {
-    newUserRegister(tknUTMB);
+    await newUserRegister(tknUTMB);
+  } else {
+    const token = jwt.sign(
+      { id: userFound._id },
+      process.env.SECRET || config.SECRET,
+      {
+        expiresIn: 43200,
+      }
+    );
+    const now = new Date();
+    const tokenExp = now.setHours(now.getHours() + 48);
+    await userFound.updateOne({ tokenExp }); // guardar la fecha de expiración en el campo tokenExp
+
+    const refreshToken = jwt.sign(
+      { id: userFound._id },
+      process.env.REFRESH_SECRET || config.REFRESH_SECRET,
+      {
+        expiresIn: 1296000, // 15 días
+      }
+    );
+
+    res.status(200).json({
+      token,
+      refreshToken,
+      email,
+      id: userFound._id,
+      name: userFound.name,
+      lastname: userFound.lastname,
+      role: userFound.role,
+      document: userFound.document,
+      location: userFound.location,
+      gender: userFound.gender,
+      insurance: userFound.insurance,
+      shirtSize: userFound.shirtSize,
+      phoneNumber: userFound.phoneNumber,
+      emergencyContact: userFound.emergencyContact,
+      isCeliac: userFound.isCeliac,
+      alergic: userFound.alergic,
+      primeraCarrera: userFound.primeraCarrera,
+      primerViajeAlLugar: userFound.primerViajeAlLugar,
+      diasAlojamiento: userFound.diasAlojamiento,
+      comoLlegas: userFound.comoLlegas,
+      personasNoParticipantes: userFound.personasNoParticipantes,
+      comoTeEnteraste: userFound.comoTeEnteraste,
+      carrerasAlAnio: userFound.carrerasAlAnio,
+      basesYCondiciones: userFound.basesYCondiciones,
+    });
   }
-
-  const token = jwt.sign(
-    { id: userFound._id },
-    process.env.SECRET || config.SECRET,
-    {
-      expiresIn: 43200,
-    }
-  );
-  const now = new Date();
-  const tokenExp = now.setHours(now.getHours() + 48);
-  await userFound.updateOne({ tokenExp }); // guardar la fecha de expiración en el campo tokenExp
-
-  const refreshToken = jwt.sign(
-    { id: userFound._id },
-    process.env.REFRESH_SECRET || config.REFRESH_SECRET,
-    {
-      expiresIn: 1296000, // 15 días
-    }
-  );
-
-  res.status(200).json({
-    token,
-    refreshToken,
-    email,
-    id: userFound._id,
-    name: userFound.name,
-    lastname: userFound.lastname,
-    role: userFound.role,
-    document: userFound.document,
-    location: userFound.location,
-    gender: userFound.gender,
-    insurance: userFound.insurance,
-    shirtSize: userFound.shirtSize,
-    phoneNumber: userFound.phoneNumber,
-    emergencyContact: userFound.emergencyContact,
-    isCeliac: userFound.isCeliac,
-    alergic: userFound.alergic,
-    primeraCarrera: userFound.primeraCarrera,
-    primerViajeAlLugar: userFound.primerViajeAlLugar,
-    diasAlojamiento: userFound.diasAlojamiento,
-    comoLlegas: userFound.comoLlegas,
-    personasNoParticipantes: userFound.personasNoParticipantes,
-    comoTeEnteraste: userFound.comoTeEnteraste,
-    carrerasAlAnio: userFound.carrerasAlAnio,
-    basesYCondiciones: userFound.basesYCondiciones,
-  });
 };
 
 const UpdateDataFromUser = async (data) => {
@@ -242,7 +242,32 @@ const newUserRegister = async (data) => {
         expiresIn: 43200, // 12 horas
       }
     );
-    res.json({ token });
+    res.status(200).json({
+      token,
+      refreshToken,
+      email,
+      id: savedUser._id,
+      name: savedUser.name,
+      lastname: savedUser.lastname,
+      role: savedUser.role,
+      document: savedUser.document,
+      location: savedUser.location,
+      gender: savedUser.gender,
+      insurance: savedUser.insurance,
+      shirtSize: savedUser.shirtSize,
+      phoneNumber: savedUser.phoneNumber,
+      emergencyContact: savedUser.emergencyContact,
+      isCeliac: savedUser.isCeliac,
+      alergic: savedUser.alergic,
+      primeraCarrera: savedUser.primeraCarrera,
+      primerViajeAlLugar: savedUser.primerViajeAlLugar,
+      diasAlojamiento: savedUser.diasAlojamiento,
+      comoLlegas: savedUser.comoLlegas,
+      personasNoParticipantes: savedUser.personasNoParticipantes,
+      comoTeEnteraste: savedUser.comoTeEnteraste,
+      carrerasAlAnio: savedUser.carrerasAlAnio,
+      basesYCondiciones: savedUser.basesYCondiciones,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
