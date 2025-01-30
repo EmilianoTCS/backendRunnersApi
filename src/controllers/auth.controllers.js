@@ -219,8 +219,8 @@ const newUserRegister = async (data) => {
   try {
     const newUser = new User({
       email,
-      given_name,
-      family_name,
+      name: given_name,
+      lastname: family_name,
       gender,
       role: "user",
       basesYCondiciones: "acepto",
@@ -240,6 +240,13 @@ const newUserRegister = async (data) => {
       process.env.SECRET || config.SECRET,
       {
         expiresIn: 43200, // 12 horas
+      }
+    );
+    const refreshToken = jwt.sign(
+      { id: savedUser._id },
+      process.env.REFRESH_SECRET || config.REFRESH_SECRET,
+      {
+        expiresIn: 1296000, // 15 días
       }
     );
     res.status(200).json({
